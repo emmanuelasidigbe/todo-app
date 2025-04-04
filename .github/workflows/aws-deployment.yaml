@@ -1,0 +1,36 @@
+name: Build and Push Docker Image
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1
+      - name: Login to Amazon ECR Private
+        run: |
+          aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 970547336735.dkr.ecr.eu-central-1.amazonaws.com
+      - name: Build Docker Image
+        run: |
+          docker build -t docker/todoapp .
+      - name: Tag Docker Image for Private ECR
+        run: |
+          docker tag docker/todoapp:latest 970547336735.dkr.ecr.eu-central-1.amazonaws.com/docker/todoapp:latest
+      - name: Push Docker Image to ECR
+        run: |
+          docker push 970547336735.dkr.ecr.eu-central-1.amazonaws.com/docker/todoapp:latest
+      # - name: Create CodeDeploy Deployment
+      #   run: |
+      #     aws deploy create-deployment \
+      #       --application-name AppECS-todo-cluster-todo-service \
+      #       --deployment-group-name DgpECS-todo-cluster-todo-service \
+      #       --deployment-config-name CodeDeployDefault.ECSAllAtOnce \
+      #       --revision "{\"revisionType\": \"AppSpecContent\", \"appSpecContent\": { \"content\": \"$(jq -c . appspec.json | sed 's/"/\\"/g')\" } }"

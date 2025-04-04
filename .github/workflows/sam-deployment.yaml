@@ -1,0 +1,42 @@
+name: Deploy SAM on Change
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "sam-template.yaml"
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "sam-template.yaml"
+
+jobs:
+  deploy-sam:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - name: Install AWS SAM CLI
+        uses: aws-actions/setup-sam@v2
+
+      - name: Build SAM Application
+        run: sam build -t sam-template.yaml
+
+      - name: Deploy SAM Application
+        run: |
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset \
+            --stack-name todo-app-stack \
+            --capabilities CAPABILITY_IAM \
+            --region eu-central-1
