@@ -7,7 +7,7 @@
         "Properties": {
           "TaskDefinition": "arn:aws:ecs:eu-central-1:970547336735:task-definition/todo-task:1",
           "LoadBalancerInfo": {
-            "ContainerName": "todo-app",
+            "ContainerName": "todo-image",
             "ContainerPort": 3000
           }
         }
