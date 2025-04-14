@@ -27,10 +27,10 @@ jobs:
       - name: Push Docker Image to ECR
         run: |
           docker push 970547336735.dkr.ecr.eu-central-1.amazonaws.com/docker/todoapp:latest
-      # - name: Create CodeDeploy Deployment
-      #   run: |
-      #     aws deploy create-deployment \
-      #       --application-name AppECS-todo-cluster-todo-service \
-      #       --deployment-group-name DgpECS-todo-cluster-todo-service \
-      #       --deployment-config-name CodeDeployDefault.ECSAllAtOnce \
-      #       --revision "{\"revisionType\": \"AppSpecContent\", \"appSpecContent\": { \"content\": \"$(jq -c . appspec.json | sed 's/"/\\"/g')\" } }"
+      - name: Create CodeDeploy Deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name AppECS-todo-cluster-todo-service \
+            --deployment-group-name DgpECS-todo-cluster-todo-service \
+            --deployment-config-name CodeDeployDefault.ECSAllAtOnce \
+            --revision "{\"revisionType\": \"AppSpecContent\", \"appSpecContent\": { \"content\": \"$(jq -c . appspec.json | sed 's/"/\\"/g')\" } }"
